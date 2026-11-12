@@ -5,3 +5,10 @@ target
 **/__pycache__
 .browser-venv
 artifacts
+output
+.playwright-cli
+deploy/server/private
+.env.server
+keycloak/demo-realm.server.json
+**/credentials.json
+**/server-access.md

@@ -8,3 +8,8 @@ __pycache__/
 /output/
 /compose.override.yml
 /LOCAL-RUN.txt
+/deploy/server/private/
+.env.server
+/keycloak/demo-realm.server.json
+credentials.json
+server-access.md

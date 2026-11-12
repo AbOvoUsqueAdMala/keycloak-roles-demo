@@ -170,6 +170,10 @@ Sign in, регистрация, default `order:read`, вход пользова
 
 ## Настройки приложения
 
+Серверная конфигурация Docker Compose, Nginx и порядок развёртывания по HTTPS:
+[deploy/server/README.md](deploy/server/README.md). Серверные секреты генерируются
+отдельно и исключены из Git.
+
 | Переменная | По умолчанию |
 |---|---|
 | `KEYCLOAK_ISSUER_URI` | `http://localhost:8180/realms/demo` |

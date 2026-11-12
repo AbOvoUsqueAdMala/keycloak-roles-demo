@@ -1,0 +1,55 @@
+name: keycloak-roles-demo
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.2
+    command: ["start-dev", "--import-realm"]
+    restart: unless-stopped
+    mem_limit: 768m
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:?required}
+      KC_HOSTNAME: https://dark-soft-chocolate.chickenkiller.com:8180
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      JAVA_OPTS_KC_HEAP: "-Xms128m -Xmx384m"
+    ports:
+      - "127.0.0.1:18180:8080"
+    volumes:
+      - ${DEPLOY_REALM_FILE:-./deploy/server/private/demo-realm.json}:/opt/keycloak/data/import/demo-realm.json:ro
+      - keycloak-data:/opt/keycloak/data
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -ec
+        - |
+          exec 3<>/dev/tcp/127.0.0.1/9000
+          printf 'GET /health/ready HTTP/1.0\r\nHost: localhost\r\n\r\n' >&3
+          IFS= read -r status <&3
+          [[ "$$status" == *" 200 "* ]]
+      interval: 5s
+      timeout: 3s
+      retries: 60
+      start_period: 30s
+  application:
+    image: ${APPLICATION_IMAGE:?required}
+    build: .
+    restart: unless-stopped
+    mem_limit: 512m
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    environment:
+      KEYCLOAK_INTERNAL_URL: http://keycloak:8080
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/demo/protocol/openid-connect/certs
+      KEYCLOAK_ISSUER_URI: https://dark-soft-chocolate.chickenkiller.com:8180/realms/demo
+      KEYCLOAK_UI_CLIENT_SECRET: ${UI_CLIENT_SECRET:?required}
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+      SERVER_SERVLET_SESSION_COOKIE_SECURE: "true"
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx256m"
+    ports:
+      - "127.0.0.1:18181:8080"
+volumes:
+  keycloak-data:
+    external: true
+    name: keycloak-roles-demo_keycloak-data
