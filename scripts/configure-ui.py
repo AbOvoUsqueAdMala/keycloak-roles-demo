@@ -56,7 +56,6 @@ def configure():
     scopes_by_name = {scope["name"]: scope for scope in scopes}
     clients_and_scopes = {
         "orders-ui": desired["defaultClientScopes"],
-        "roles-sync": ["basic"],
         "demo-cli": ["basic"],
     }
     for client_name, required_scopes in clients_and_scopes.items():

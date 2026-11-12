@@ -32,10 +32,9 @@ services:
       keycloak:
         condition: service_healthy
     environment:
-      KEYCLOAK_ADMIN_URL: http://keycloak:8080
+      KEYCLOAK_INTERNAL_URL: http://keycloak:8080
       KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/demo/protocol/openid-connect/certs
       KEYCLOAK_ISSUER_URI: http://localhost:8180/realms/demo
-      KEYCLOAK_SYNC_CLIENT_SECRET: demo-sync-secret-local-only
       KEYCLOAK_UI_CLIENT_SECRET: demo-ui-secret-local-only
     ports:
       - "127.0.0.1:${API_PORT:-8080}:8080"

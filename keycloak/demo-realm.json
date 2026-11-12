@@ -9,18 +9,62 @@
       "orders-api": [
         {
           "name": "READER",
-          "description": "Bootstrap placeholder: replaced on application startup",
-          "id": "1e5d4d3d-972e-5139-b353-12a227f97dc1"
+          "description": "Read-only access",
+          "id": "1e5d4d3d-972e-5139-b353-12a227f97dc1",
+          "composite": true,
+          "composites": {
+            "client": {
+              "orders-api": [
+                "order:read"
+              ]
+            }
+          }
         },
         {
           "name": "MANAGER",
-          "description": "Bootstrap placeholder: replaced on application startup",
-          "id": "7db9ff19-de35-5c1b-b18d-5a3c17853260"
+          "description": "Manage orders",
+          "id": "7db9ff19-de35-5c1b-b18d-5a3c17853260",
+          "composite": true,
+          "composites": {
+            "client": {
+              "orders-api": [
+                "order:read",
+                "order:write"
+              ]
+            }
+          }
         },
         {
           "name": "ADMIN",
-          "description": "Bootstrap placeholder: replaced on application startup",
-          "id": "78e91f64-d7df-53e2-bb8e-35d973f703bd"
+          "description": "Administer the demo",
+          "id": "78e91f64-d7df-53e2-bb8e-35d973f703bd",
+          "composite": true,
+          "composites": {
+            "client": {
+              "orders-api": [
+                "order:read",
+                "order:write",
+                "user:read",
+                "audit:read"
+              ]
+            }
+          }
+        },
+        {
+          "name": "order:read",
+          "description": "Read all demo orders"
+        },
+        {
+          "name": "order:write",
+          "description": "Create demo orders"
+        },
+        {
+          "name": "user:read",
+          "description": "Read the demo user directory"
+        },
+        {
+          "name": "audit:read",
+          "description": "Read the audit demonstration"
         }
       ]
     }
@@ -86,23 +130,6 @@
       "bearerOnly": true,
       "standardFlowEnabled": false,
       "directAccessGrantsEnabled": false
-    },
-    {
-      "clientId": "roles-sync",
-      "enabled": true,
-      "protocol": "openid-connect",
-      "clientAuthenticatorType": "client-secret",
-      "secret": "demo-sync-secret-local-only",
-      "publicClient": false,
-      "serviceAccountsEnabled": true,
-      "standardFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "fullScopeAllowed": true,
-      "defaultClientScopes": [
-        "basic",
-        "roles",
-        "kc-admin-api"
-      ]
     },
     {
       "clientId": "demo-cli",
@@ -490,16 +517,6 @@
     }
   ],
   "users": [
-    {
-      "username": "service-account-roles-sync",
-      "enabled": true,
-      "serviceAccountClientId": "roles-sync",
-      "clientRoles": {
-        "realm-management": [
-          "manage-clients"
-        ]
-      }
-    },
     {
       "username": "reader",
       "firstName": "Demo",

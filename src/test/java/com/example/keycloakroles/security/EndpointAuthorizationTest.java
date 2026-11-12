@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest(properties = {"app.role-sync.enabled=false", "app.ui.client-secret=test-secret"})
+@SpringBootTest(properties = {"app.ui.client-secret=test-secret"})
 @AutoConfigureMockMvc
 class EndpointAuthorizationTest {
 
@@ -65,7 +65,7 @@ class EndpointAuthorizationTest {
 
 	@Test
 	void administratorCanReadUsersAndAuditEndpoint() throws Exception {
-		authenticateAs("ADMIN", "order:read", "order:write", "user:read");
+		authenticateAs("audit:read", "order:read", "order:write", "user:read");
 
 		mockMvc.perform(get("/api/users").header("Authorization", "Bearer test-token"))
 			.andExpect(status().isOk());
@@ -73,6 +73,29 @@ class EndpointAuthorizationTest {
 			.andExpect(status().isOk());
 		mockMvc.perform(get("/api/profile").header("Authorization", "Bearer test-token"))
 			.andExpect(status().isOk()).andExpect(jsonPath("$.subject").value("user-1"));
+	}
+
+	@Test
+	void auditPermissionWorksWithoutAnyBusinessRole() throws Exception {
+		authenticateAs("custom-reviewer", "audit:read");
+
+		mockMvc.perform(get("/api/admin/audit").header("Authorization", "Bearer test-token"))
+			.andExpect(status().isOk());
+		mockMvc.perform(get("/api/users").header("Authorization", "Bearer test-token"))
+			.andExpect(status().isForbidden());
+		mockMvc.perform(get("/api/profile").header("Authorization", "Bearer test-token"))
+			.andExpect(jsonPath("$.authorities.length()").value(1))
+			.andExpect(jsonPath("$.authorities[0]").value("audit:read"));
+	}
+
+	@Test
+	void adminRoleNameAloneDoesNotGrantAuditAccess() throws Exception {
+		authenticateAs("ADMIN", "ROLE_ADMIN", "unknown:write");
+
+		mockMvc.perform(get("/api/admin/audit").header("Authorization", "Bearer test-token"))
+			.andExpect(status().isForbidden());
+		mockMvc.perform(get("/api/profile").header("Authorization", "Bearer test-token"))
+			.andExpect(jsonPath("$.authorities").isEmpty());
 	}
 
 	@Test

@@ -25,7 +25,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.util.UriComponentsBuilder;
 
-@SpringBootTest(properties = {"app.role-sync.enabled=false", "app.ui.client-secret=test-secret"})
+@SpringBootTest(properties = {"app.ui.client-secret=test-secret"})
 @AutoConfigureMockMvc
 class UiAuthorizationTest {
 
@@ -64,8 +64,7 @@ class UiAuthorizationTest {
 
 	@Test
 	void readerSeesAllSectionsAndReceivesAUsefulDeniedPage() throws Exception {
-		var reader = oidcLogin().authorities(new SimpleGrantedAuthority("ROLE_READER"),
-			new SimpleGrantedAuthority("order:read"));
+		var reader = oidcLogin().authorities(new SimpleGrantedAuthority("order:read"));
 		mockMvc.perform(get("/").with(reader)).andExpect(status().isOk())
 			.andExpect(content().string(containsString("Заказы")))
 			.andExpect(content().string(containsString("Пользователи")))
@@ -100,7 +99,7 @@ class UiAuthorizationTest {
 
 	@Test
 	void administratorCanOpenUsersAuditAndProfile() throws Exception {
-		var administrator = oidcLogin().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"),
+		var administrator = oidcLogin().authorities(new SimpleGrantedAuthority("audit:read"),
 			new SimpleGrantedAuthority("user:read"));
 		mockMvc.perform(get("/ui/users").with(administrator)).andExpect(status().isOk());
 		mockMvc.perform(get("/ui/audit").with(administrator)).andExpect(status().isOk());

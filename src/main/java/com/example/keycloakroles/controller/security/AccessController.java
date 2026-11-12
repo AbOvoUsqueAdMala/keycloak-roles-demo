@@ -2,6 +2,7 @@ package com.example.keycloakroles.controller.security;
 
 import com.example.keycloakroles.model.dto.MessageResponse;
 import com.example.keycloakroles.model.dto.security.ProfileResponse;
+import com.example.keycloakroles.security.ApplicationPermission;
 import com.example.keycloakroles.service.security.DemoAdministrationService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class AccessController {
 	@GetMapping("/api/profile")
 	public ProfileResponse profile(Authentication authentication) {
 		List<String> authorities = authentication.getAuthorities().stream()
-			.map(GrantedAuthority::getAuthority).sorted().toList();
+			.map(GrantedAuthority::getAuthority).filter(ApplicationPermission::supports).sorted().toList();
 		return new ProfileResponse(authentication.getName(), authorities);
 	}
 

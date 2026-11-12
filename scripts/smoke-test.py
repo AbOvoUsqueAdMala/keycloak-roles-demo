@@ -3,6 +3,7 @@
 
 import json
 import os
+from pathlib import Path
 import sys
 import time
 from urllib.error import HTTPError
@@ -53,7 +54,7 @@ def wait_until_ready():
         except (OSError, AssertionError):
             pass
         time.sleep(1)
-    raise AssertionError("Application did not become ready with synchronized roles within 120 seconds")
+    raise AssertionError("Application did not become ready with realm permissions within 120 seconds")
 
 
 def check_access():
@@ -78,41 +79,38 @@ def check_access():
     assert request("GET", API_URL + "/api/orders", "invalid-token")[0] == 401
 
 
-def check_synchronized_roles():
-    status, response = request("POST", TOKEN_URL, form={
-        "grant_type": "client_credentials", "client_id": "roles-sync",
-        "client_secret": os.environ.get("KEYCLOAK_SYNC_CLIENT_SECRET", "demo-sync-secret-local-only"),
+def check_realm_roles():
+    status, response = request("POST", KEYCLOAK_URL + "/realms/master/protocol/openid-connect/token", form={
+        "grant_type": "password", "client_id": "admin-cli",
+        "username": os.environ.get("KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME", "admin"),
+        "password": os.environ.get("KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD", "admin-local-only"),
     })
-    assert status == 200, f"Service account token request: expected 200, got {status}"
+    assert status == 200, f"Test admin token request: expected 200, got {status}"
     token = response["access_token"]
     status, clients = request("GET", KEYCLOAK_URL + "/admin/realms/demo/clients?clientId=orders-api", token)
     assert status == 200 and len(clients) == 1, "Cannot resolve orders-api client UUID"
     role_url = KEYCLOAK_URL + "/admin/realms/demo/clients/" + clients[0]["id"] + "/roles/"
-    expected_roles = {
-        "order:read": ("Read all demo orders", set()),
-        "order:write": ("Create demo orders", set()),
-        "user:read": ("Read the demo user directory", set()),
-        "READER": ("Read-only access", {"order:read"}),
-        "MANAGER": ("Manage orders", {"order:read", "order:write"}),
-        "ADMIN": ("Administer the demo", {"order:read", "order:write", "user:read"}),
-    }
-    for name, (description, members) in expected_roles.items():
+    bootstrap = json.loads((Path(__file__).resolve().parents[1] / "keycloak/demo-realm.json").read_text())
+    for definition in bootstrap["roles"]["client"]["orders-api"]:
+        name = definition["name"]
+        members = set(definition.get("composites", {}).get("client", {}).get("orders-api", []))
         url = role_url + quote(name, safe="")
         status, role = request("GET", url, token)
         assert status == 200, f"Role {name} is missing"
-        assert role["description"] == description, f"Role {name}: description drift"
-        assert role["attributes"]["managed-by"] == ["orders-api"], f"Role {name}: wrong owner"
+        assert role["description"] == definition["description"], f"Role {name}: description drift"
         status, composites = request("GET", url + "/composites", token)
         assert status == 200
         assert {member["name"] for member in composites} == members, f"Role {name}: composite drift"
-        print(f"PASS synchronized role {name}")
+        print(f"PASS realm role {name}")
+    status, obsolete_clients = request("GET", KEYCLOAK_URL + "/admin/realms/demo/clients?clientId=roles-sync", token)
+    assert status == 200 and not obsolete_clients, "Obsolete administrative roles-sync client still exists"
 
 
 if __name__ == "__main__":
     try:
         wait_until_ready()
         check_access()
-        check_synchronized_roles()
+        check_realm_roles()
         print("All real Keycloak / API smoke checks passed.")
     except (AssertionError, OSError, KeyError) as error:
         print(f"FAIL: {error}", file=sys.stderr)

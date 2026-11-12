@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 public record KeycloakProperties(
 	@NotNull URI issuerUri,
 	@NotNull URI jwkSetUri,
-	@NotNull URI adminUrl,
+	@NotNull URI internalUrl,
 	@NotBlank String realm,
 	@NotBlank String resourceClientId) {
 }

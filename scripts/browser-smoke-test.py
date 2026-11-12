@@ -65,7 +65,7 @@ def check_registration(page, context):
     expect(page.locator("h1")).to_have_text("Обзор")
     assert page.locator("nav a").count() == 5
     assert page.locator(".section-card").count() == 4
-    expect(page.locator(".role-chip").first).to_have_text("READER")
+    expect(page.locator(".permission-chip").first).to_have_text("order:read")
     page.screenshot(path=str(ARTIFACTS / "ui-reader-desktop.png"), full_page=True)
     page.get_by_role("navigation").get_by_role("link", name="Заказы", exact=True).click()
     expect(page.locator("#item")).to_be_disabled()
@@ -93,7 +93,7 @@ def check_administrator(page):
     assert page.goto(API_URL + "/ui/users").status == 200
     expect(page.locator("tbody")).to_contain_text("reader")
     assert page.goto(API_URL + "/ui/audit").status == 200
-    expect(page.locator(".confirmation-panel h2")).to_have_text("Доступ администратора подтверждён")
+    expect(page.locator(".confirmation-panel h2")).to_have_text("Доступ к аудиту подтверждён")
     assert page.goto(API_URL + "/ui/profile").status == 200
     expect(page.locator(".profile-card")).to_contain_text("administrator@example.test")
     page.goto(API_URL + "/")

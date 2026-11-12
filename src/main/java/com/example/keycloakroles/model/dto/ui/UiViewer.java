@@ -4,6 +4,6 @@ import java.util.List;
 
 public record UiViewer(
 	String displayName, String email, String subject, String initials,
-	List<String> roles, List<String> permissions,
-	boolean canReadOrders, boolean canWriteOrders, boolean canReadUsers, boolean administrator) {
+	List<String> permissions,
+	boolean canReadOrders, boolean canWriteOrders, boolean canReadUsers, boolean canReadAudit) {
 }

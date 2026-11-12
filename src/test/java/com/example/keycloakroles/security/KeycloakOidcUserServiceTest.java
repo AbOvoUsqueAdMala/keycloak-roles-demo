@@ -26,15 +26,15 @@ class KeycloakOidcUserServiceTest {
 		jwtDecoder, new KeycloakAuthoritiesConverter("orders-api"));
 
 	@Test
-	void mapsRolesFromTheValidatedAccessToken() {
+	void mapsOnlyPermissionsFromTheValidatedAccessToken() {
 		Jwt accessToken = Jwt.withTokenValue("access-token").header("alg", "RS256").subject("user-1")
 			.claim("resource_access", Map.of("orders-api", Map.of("roles", List.of("READER", "order:read"))))
 			.build();
 		when(jwtDecoder.decode("access-token")).thenReturn(accessToken);
 
 		assertThat(userService.loadUser(userRequest()).getAuthorities())
-			.extracting(GrantedAuthority::getAuthority).contains("ROLE_READER", "order:read")
-			.doesNotContain("ROLE_ADMIN");
+			.extracting(GrantedAuthority::getAuthority).contains("order:read")
+			.doesNotContain("ROLE_ADMIN", "ROLE_READER", "ADMIN", "READER");
 	}
 
 	@Test

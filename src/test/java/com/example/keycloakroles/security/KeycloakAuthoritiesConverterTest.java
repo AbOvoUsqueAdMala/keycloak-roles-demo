@@ -13,16 +13,17 @@ class KeycloakAuthoritiesConverterTest {
 	private final KeycloakAuthoritiesConverter converter = new KeycloakAuthoritiesConverter("orders-api");
 
 	@Test
-	void mapsOnlyRolesOfTheIntendedClientAndKeepsPermissionNames() {
+	void acceptsOnlyKnownPermissionsOfTheIntendedClient() {
 		Jwt jwt = Jwt.withTokenValue("test-token").header("alg", "RS256").subject("user-1")
 			.claim("realm_access", Map.of("roles", List.of("ADMIN")))
 			.claim("resource_access", Map.of(
-				"orders-api", Map.of("roles", List.of("READER", "order:read", "READER")),
+				"orders-api", Map.of("roles", List.of("READER", "ADMIN", "order:read",
+					"order:read", "audit:read", "unknown:write", "ROLE_ADMIN", 42)),
 				"another-api", Map.of("roles", List.of("ADMIN", "user:read"))))
 			.build();
 
 		assertThat(converter.convert(jwt)).extracting(GrantedAuthority::getAuthority)
-			.containsExactlyInAnyOrder("ROLE_READER", "order:read");
+			.containsExactlyInAnyOrder("order:read", "audit:read");
 	}
 
 	@Test

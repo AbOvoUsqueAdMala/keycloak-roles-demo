@@ -37,7 +37,7 @@ class OrderServiceAuthorizationTest {
 
 	@Test
 	void readerCannotWriteThroughTheServiceBoundary() {
-		authenticate("ROLE_READER", "order:read");
+		authenticate("order:read");
 
 		assertThat(orderService.findOrders()).hasSize(1);
 		assertThatThrownBy(() -> orderService.createOrder(new CreateOrderRequest("Book")))
@@ -47,7 +47,7 @@ class OrderServiceAuthorizationTest {
 
 	@Test
 	void managerWithWritePermissionCanCreateAnOrder() {
-		authenticate("ROLE_MANAGER", "order:read", "order:write");
+		authenticate("order:read", "order:write");
 
 		assertThat(orderService.createOrder(new CreateOrderRequest("Book")).item()).isEqualTo("Book");
 		assertThat(orderService.findOrders()).hasSize(2);

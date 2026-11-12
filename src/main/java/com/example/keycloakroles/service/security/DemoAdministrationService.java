@@ -13,8 +13,8 @@ public class DemoAdministrationService {
 		return List.of("reader", "manager", "administrator");
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAuthority('audit:read')")
 	public MessageResponse readAuditExample() {
-		return new MessageResponse("Access to the ADMIN-only demonstration endpoint granted");
+		return new MessageResponse("Access to the audit demonstration granted");
 	}
 }

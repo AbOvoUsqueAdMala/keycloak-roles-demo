@@ -2,6 +2,7 @@ package com.example.keycloakroles.service.ui;
 
 import com.example.keycloakroles.model.dto.ui.UiNavigationItem;
 import com.example.keycloakroles.model.dto.ui.UiViewer;
+import com.example.keycloakroles.security.ApplicationPermission;
 import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,13 +27,11 @@ public class UiViewModelService {
 		String displayName = displayName(authentication, user);
 		String email = user != null && StringUtils.hasText(user.getEmail())
 			? user.getEmail() : "Не указан";
-		List<String> roles = authorities.stream().filter(name -> name.startsWith("ROLE_"))
-			.map(name -> name.substring(5)).toList();
-		List<String> permissions = authorities.stream().filter(name -> name.contains(":")).toList();
+		List<String> permissions = authorities.stream().filter(ApplicationPermission::supports).toList();
 		return new UiViewer(displayName, email, authentication.getName(),
-			displayName.substring(0, 1).toUpperCase(), roles, permissions,
+			displayName.substring(0, 1).toUpperCase(), permissions,
 			authorities.contains("order:read"), authorities.contains("order:write"),
-			authorities.contains("user:read"), authorities.contains("ROLE_ADMIN"));
+			authorities.contains("user:read"), authorities.contains("audit:read"));
 	}
 
 	private String displayName(Authentication authentication, OidcUser user) {
@@ -53,9 +52,9 @@ public class UiViewModelService {
 				"/ui/orders", "orders", viewer.canReadOrders()),
 			new UiNavigationItem("users", "Пользователи", "Демонстрационная команда",
 				"/ui/users", "users", viewer.canReadUsers()),
-			new UiNavigationItem("audit", "Аудит", "Проверка доступа администратора",
-				"/ui/audit", "audit", viewer.administrator()),
-			new UiNavigationItem("profile", "Мой профиль", "Учётная запись и ваши роли",
+			new UiNavigationItem("audit", "Аудит", "Проверка доступа к аудиту",
+				"/ui/audit", "audit", viewer.canReadAudit()),
+			new UiNavigationItem("profile", "Мой профиль", "Учётная запись и ваши разрешения",
 				"/ui/profile", "profile", true));
 	}
 }

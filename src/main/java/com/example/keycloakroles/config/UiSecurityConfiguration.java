@@ -32,7 +32,7 @@ public class UiSecurityConfiguration {
 			throw new IllegalStateException("KEYCLOAK_UI_CLIENT_SECRET is required for browser login");
 		}
 		String issuer = keycloak.issuerUri().toString();
-		String internalRealm = keycloak.adminUrl() + "/realms/" + keycloak.realm();
+		String internalRealm = keycloak.internalUrl() + "/realms/" + keycloak.realm();
 		ClientRegistration registration = ClientRegistration.withRegistrationId("keycloak")
 			.clientName("Keycloak").clientId(uiProperties.clientId())
 			.clientSecret(uiProperties.clientSecret())

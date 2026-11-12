@@ -25,9 +25,8 @@ public class KeycloakAuthoritiesConverter implements Converter<Jwt, Collection<G
 		}
 		Set<GrantedAuthority> authorities = new LinkedHashSet<>();
 		for (Object roleName : roleNames) {
-			if (roleName instanceof String name && !name.isBlank()) {
-				String authority = name.contains(":") ? name : "ROLE_" + name;
-				authorities.add(new SimpleGrantedAuthority(authority));
+			if (roleName instanceof String name && ApplicationPermission.supports(name)) {
+				authorities.add(new SimpleGrantedAuthority(name));
 			}
 		}
 		return authorities;
