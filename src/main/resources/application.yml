@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: keycloak-roles-demo
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+        same-site: lax
+
+app:
+  ui:
+    client-id: ${KEYCLOAK_UI_CLIENT_ID:orders-ui}
+    client-secret: ${KEYCLOAK_UI_CLIENT_SECRET:}
+  keycloak:
+    issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/demo}
+    jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8180/realms/demo/protocol/openid-connect/certs}
+    admin-url: ${KEYCLOAK_ADMIN_URL:http://localhost:8180}
+    realm: ${KEYCLOAK_REALM:demo}
+    resource-client-id: ${KEYCLOAK_RESOURCE_CLIENT_ID:orders-api}
+  role-sync:
+    enabled: ${KEYCLOAK_ROLE_SYNC_ENABLED:true}
+    prune: ${KEYCLOAK_ROLE_SYNC_PRUNE:false}
+    client-id: ${KEYCLOAK_SYNC_CLIENT_ID:roles-sync}
+    client-secret: ${KEYCLOAK_SYNC_CLIENT_SECRET:}

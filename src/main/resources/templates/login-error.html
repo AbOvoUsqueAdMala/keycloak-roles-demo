@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Вход в приложение · Access Desk</title>
+  <link rel="stylesheet" th:href="@{/assets/workspace.css}">
+  <link rel="icon" th:href="@{/assets/favicon.svg}" type="image/svg+xml">
+</head>
+<body class="auth-error">
+<main class="panel confirmation-panel">
+  <p class="eyebrow">ACCESS DESK</p><h1>Не удалось завершить вход</h1>
+  <p>Попробуйте войти ещё раз. Если проблема повторяется,<br>обратитесь к администратору приложения.</p>
+  <a class="button button-primary" th:href="@{/oauth2/authorization/keycloak}">Повторить вход</a>
+  <a class="text-link" th:href="@{/oauth2/authorization/keycloak(screen='register')}">Создать учётную запись</a>
+</main>
+</body>
+</html>

@@ -1,0 +1,28 @@
+Проверка чистого развёртывания — 12.11.2026
+
+Команда запуска:
+docker compose -p keycloak-clean-check -f compose.yml -f artifacts/clean-import.compose.yml up -d --no-build --pull never
+
+Создан новый volume keycloak-clean-check_keycloak-data.
+Keycloak 26.8.2 импортировал keycloak/demo-realm.json через start-dev --import-realm.
+Использован уже собранный образ текущего приложения; Java-код в этой задаче не менялся.
+Настроечные configure-*.py в тестовом окружении не запускались.
+
+scripts/check-user-operator.py: PASS
+- user-operator вошёл с паролем user-operator-local-only;
+- создание, поиск, просмотр, изменение, удаление временного пользователя;
+- установка временного пароля;
+- назначение и снятие READER, MANAGER, ADMIN клиента orders-api;
+- HTTP 403 при назначении realm-admin, manage-users, query-users;
+- HTTP 403 при изменении realm и клиента orders-api;
+- HTTP 403 при impersonation;
+- временный пользователь удалён.
+
+scripts/smoke-test.py: PASS
+- токены и матрица доступа reader, manager, administrator;
+- открытый endpoint и отказ без валидного токена;
+- синхронизация шести ролей приложения, описаний и состава.
+
+Проверочные скрипты выполнялись после импорта и только проверяли готовую конфигурацию.
+Они не включали Admin Permissions, не создавали оператора и не выдавали ему права.
+Основное окружение keycloak-roles-demo и его данные сохранены.

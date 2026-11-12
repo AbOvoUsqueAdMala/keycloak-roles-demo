@@ -1,0 +1,589 @@
+{
+  "realm": "demo",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "accessTokenLifespan": 120,
+  "roles": {
+    "client": {
+      "orders-api": [
+        {
+          "name": "READER",
+          "description": "Bootstrap placeholder: replaced on application startup",
+          "id": "1e5d4d3d-972e-5139-b353-12a227f97dc1"
+        },
+        {
+          "name": "MANAGER",
+          "description": "Bootstrap placeholder: replaced on application startup",
+          "id": "7db9ff19-de35-5c1b-b18d-5a3c17853260"
+        },
+        {
+          "name": "ADMIN",
+          "description": "Bootstrap placeholder: replaced on application startup",
+          "id": "78e91f64-d7df-53e2-bb8e-35d973f703bd"
+        }
+      ]
+    }
+  },
+  "groups": [
+    {
+      "name": "Readers",
+      "path": "/Readers",
+      "clientRoles": {
+        "orders-api": [
+          "READER"
+        ]
+      }
+    }
+  ],
+  "defaultGroups": [
+    "/Readers"
+  ],
+  "clients": [
+    {
+      "clientId": "orders-ui",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "clientAuthenticatorType": "client-secret",
+      "secret": "demo-ui-secret-local-only",
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": true,
+      "redirectUris": [
+        "http://localhost:8080/login/oauth2/code/keycloak",
+        "http://localhost:8280/login/oauth2/code/keycloak"
+      ],
+      "defaultClientScopes": [
+        "basic",
+        "roles",
+        "profile",
+        "email"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:8080/##http://localhost:8280/"
+      },
+      "protocolMappers": [
+        {
+          "name": "orders-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "orders-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "orders-api",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "bearerOnly": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    },
+    {
+      "clientId": "roles-sync",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "clientAuthenticatorType": "client-secret",
+      "secret": "demo-sync-secret-local-only",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "fullScopeAllowed": true,
+      "defaultClientScopes": [
+        "basic",
+        "roles",
+        "kc-admin-api"
+      ]
+    },
+    {
+      "clientId": "demo-cli",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "fullScopeAllowed": true,
+      "defaultClientScopes": [
+        "basic",
+        "roles",
+        "profile"
+      ],
+      "protocolMappers": [
+        {
+          "name": "orders-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "orders-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "id": "f8e6ae38-433c-5da6-9595-c4405ff03f7f",
+      "clientId": "admin-permissions",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "fullScopeAllowed": false,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": true,
+        "policyEnforcementMode": "ENFORCING",
+        "resources": [
+          {
+            "name": "Clients",
+            "type": "Clients",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "uris": [],
+            "scopes": [
+              {
+                "name": "view"
+              },
+              {
+                "name": "map-roles-client-scope"
+              },
+              {
+                "name": "map-roles"
+              },
+              {
+                "name": "manage"
+              },
+              {
+                "name": "map-roles-composite"
+              }
+            ]
+          },
+          {
+            "name": "Organizations",
+            "type": "Organizations",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "uris": [],
+            "scopes": [
+              {
+                "name": "view"
+              },
+              {
+                "name": "manage"
+              }
+            ]
+          },
+          {
+            "name": "Roles",
+            "type": "Roles",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "uris": [],
+            "scopes": [
+              {
+                "name": "map-role-composite"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role"
+              }
+            ]
+          },
+          {
+            "name": "Groups",
+            "type": "Groups",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "uris": [],
+            "scopes": [
+              {
+                "name": "manage-members"
+              },
+              {
+                "name": "view"
+              },
+              {
+                "name": "manage-membership-of-members"
+              },
+              {
+                "name": "manage-membership"
+              },
+              {
+                "name": "delegate-members"
+              },
+              {
+                "name": "view-members"
+              },
+              {
+                "name": "manage"
+              },
+              {
+                "name": "impersonate-members"
+              }
+            ]
+          },
+          {
+            "name": "Users",
+            "type": "Users",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "uris": [],
+            "scopes": [
+              {
+                "name": "delegate"
+              },
+              {
+                "name": "manage-group-membership"
+              },
+              {
+                "name": "view"
+              },
+              {
+                "name": "impersonate"
+              },
+              {
+                "name": "map-roles"
+              },
+              {
+                "name": "reset-password"
+              },
+              {
+                "name": "manage"
+              }
+            ]
+          },
+          {
+            "name": "1e5d4d3d-972e-5139-b353-12a227f97dc1",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "uris": [],
+            "scopes": [
+              {
+                "name": "map-role-composite"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role"
+              }
+            ]
+          },
+          {
+            "name": "7db9ff19-de35-5c1b-b18d-5a3c17853260",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "uris": [],
+            "scopes": [
+              {
+                "name": "map-role-composite"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role"
+              }
+            ]
+          },
+          {
+            "name": "78e91f64-d7df-53e2-bb8e-35d973f703bd",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "uris": [],
+            "scopes": [
+              {
+                "name": "map-role-composite"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role"
+              }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "demo-user-operator-policy",
+            "type": "user",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "users": "[\"user-operator\"]"
+            }
+          },
+          {
+            "name": "demo-user-operator-manage-users",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "defaultResourceType": "Users",
+              "resources": "[\"Users\"]",
+              "scopes": "[\"manage\",\"map-roles\",\"view\"]",
+              "applyPolicies": "[\"demo-user-operator-policy\"]"
+            }
+          },
+          {
+            "name": "demo-user-operator-assign-application-roles",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "defaultResourceType": "Roles",
+              "resources": "[\"7db9ff19-de35-5c1b-b18d-5a3c17853260\", \"1e5d4d3d-972e-5139-b353-12a227f97dc1\", \"78e91f64-d7df-53e2-bb8e-35d973f703bd\"]",
+              "scopes": "[\"map-role\"]",
+              "applyPolicies": "[\"demo-user-operator-policy\"]"
+            }
+          }
+        ],
+        "scopes": [
+          {
+            "name": "manage-group-membership"
+          },
+          {
+            "name": "map-roles-client-scope"
+          },
+          {
+            "name": "delegate-members"
+          },
+          {
+            "name": "map-role"
+          },
+          {
+            "name": "view-members"
+          },
+          {
+            "name": "reset-password"
+          },
+          {
+            "name": "manage"
+          },
+          {
+            "name": "impersonate-members"
+          },
+          {
+            "name": "manage-members"
+          },
+          {
+            "name": "delegate"
+          },
+          {
+            "name": "view"
+          },
+          {
+            "name": "manage-membership-of-members"
+          },
+          {
+            "name": "manage-membership"
+          },
+          {
+            "name": "impersonate"
+          },
+          {
+            "name": "map-role-composite"
+          },
+          {
+            "name": "map-roles"
+          },
+          {
+            "name": "map-role-client-scope"
+          },
+          {
+            "name": "map-roles-composite"
+          }
+        ],
+        "decisionStrategy": "UNANIMOUS",
+        "authorizationSchema": {
+          "resourceTypes": {
+            "Clients": {
+              "type": "Clients",
+              "scopes": [
+                "map-roles",
+                "map-roles-client-scope",
+                "view",
+                "map-roles-composite",
+                "manage"
+              ],
+              "scopeAliases": {}
+            },
+            "Organizations": {
+              "type": "Organizations",
+              "scopes": [
+                "view",
+                "manage"
+              ],
+              "scopeAliases": {}
+            },
+            "Roles": {
+              "type": "Roles",
+              "scopes": [
+                "map-role",
+                "map-role-client-scope",
+                "map-role-composite"
+              ],
+              "scopeAliases": {}
+            },
+            "Groups": {
+              "type": "Groups",
+              "scopes": [
+                "view-members",
+                "delegate-members",
+                "manage",
+                "view",
+                "impersonate-members",
+                "manage-membership",
+                "manage-members",
+                "manage-membership-of-members"
+              ],
+              "scopeAliases": {}
+            },
+            "Users": {
+              "type": "Users",
+              "scopes": [
+                "view",
+                "map-roles",
+                "delegate",
+                "manage",
+                "impersonate",
+                "manage-group-membership",
+                "reset-password"
+              ],
+              "scopeAliases": {
+                "view": [
+                  "view-members"
+                ],
+                "manage-group-membership": [
+                  "manage-membership-of-members"
+                ],
+                "delegate": [
+                  "delegate-members"
+                ],
+                "impersonate": [
+                  "impersonate-members"
+                ],
+                "manage": [
+                  "manage-members"
+                ]
+              },
+              "groupType": "Groups"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "service-account-roles-sync",
+      "enabled": true,
+      "serviceAccountClientId": "roles-sync",
+      "clientRoles": {
+        "realm-management": [
+          "manage-clients"
+        ]
+      }
+    },
+    {
+      "username": "reader",
+      "firstName": "Demo",
+      "lastName": "Reader",
+      "email": "reader@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "reader-local-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "orders-api": [
+          "READER"
+        ]
+      }
+    },
+    {
+      "username": "manager",
+      "firstName": "Demo",
+      "lastName": "Manager",
+      "email": "manager@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "manager-local-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "orders-api": [
+          "MANAGER"
+        ]
+      }
+    },
+    {
+      "username": "administrator",
+      "firstName": "Demo",
+      "lastName": "Administrator",
+      "email": "administrator@example.test",
+      "emailVerified": true,
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "administrator-local-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "orders-api": [
+          "ADMIN"
+        ]
+      }
+    },
+    {
+      "username": "user-operator",
+      "enabled": true,
+      "firstName": "User",
+      "lastName": "Operator",
+      "email": "user-operator@example.test",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "user-operator-local-only",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "realm-management": [
+          "query-users"
+        ]
+      }
+    }
+  ],
+  "adminPermissionsEnabled": true,
+  "adminPermissionsClient": {
+    "id": "f8e6ae38-433c-5da6-9595-c4405ff03f7f",
+    "clientId": "admin-permissions"
+  }
+}

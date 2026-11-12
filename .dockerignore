@@ -1,0 +1,7 @@
+target
+.git
+.idea
+.env
+**/__pycache__
+.browser-venv
+artifacts

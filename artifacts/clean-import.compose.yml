@@ -1,0 +1,18 @@
+# Run with -f compose.yml -f artifacts/clean-import.compose.yml -p keycloak-clean-check.
+services:
+  keycloak:
+    environment:
+      KC_HOSTNAME: http://localhost:18180
+    ports: !override
+      - "127.0.0.1:18180:8080"
+  application:
+    image: keycloak-roles-demo-application:latest
+    environment:
+      KEYCLOAK_ISSUER_URI: http://localhost:18180/realms/demo
+    ports: !override
+      - "127.0.0.1:8280:8080"
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 10.203.241.0/24

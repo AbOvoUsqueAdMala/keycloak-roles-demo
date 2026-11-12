@@ -1,0 +1,10 @@
+/target/
+/.idea/
+*.iml
+.env
+__pycache__/
+/.browser-venv/
+/.playwright-cli/
+/output/
+/compose.override.yml
+/LOCAL-RUN.txt
